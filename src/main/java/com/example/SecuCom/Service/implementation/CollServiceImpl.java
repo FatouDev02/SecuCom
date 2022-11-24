@@ -111,7 +111,7 @@ public class CollServiceImpl implements CollService, UserDetailsService {
 
     }
 
-// la  méthode loadUserByUsername(String username)est utilisé  pour rechercher  UserDetails(les details)  pour un  nom d' utilisateur donné
+//la  méthode loadUserByUsername(String username)est utilisé  pour rechercher  UserDetails(les details)  pour un  nom d' utilisateur donné
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (username.trim().isEmpty()) {

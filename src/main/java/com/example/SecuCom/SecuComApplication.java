@@ -39,7 +39,6 @@ public class SecuComApplication {
 			//attribuer un role a un user
 			collService.addroletoColl("fcusername","Role_ADMIN");
 			collService.addroletoColl("fcusername","Role_USER");
-
 			collService.addroletoColl("lydusername","Role_USER");
 
 		};

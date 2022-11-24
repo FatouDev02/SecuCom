@@ -34,7 +34,7 @@ public class CustonAuthentificationFilter extends UsernamePasswordAuthentication
 
     //CustonAuthentificationFilter est appelé dans SecurityConfig dans la requete du filter
 
-//gestion de l'authentification
+//gestion de l'authentification           Effectue l'authentification réelle.
             @Override
             public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
                 // return super.attemptAuthentication(request, response);

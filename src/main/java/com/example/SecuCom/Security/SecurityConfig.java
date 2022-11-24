@@ -45,17 +45,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // super.configure(http);
         //processus de filtrage
         CustonAuthentificationFilter custonAuthentificationFilter=new CustonAuthentificationFilter(authenticationManagerBean());
+        //setFilterProcessesUrl indique l'URL à laquelle ce filtre répondra.
         custonAuthentificationFilter.setFilterProcessesUrl("/login");
 
 
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(STATELESS);
         http.authorizeRequests().antMatchers("/login/**","/refreshtoken/**").permitAll();
-
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/api/coll/**").hasAnyAuthority("Role_USER");
         http.authorizeRequests().antMatchers(HttpMethod.GET,"/coll/afficher/**").hasAnyAuthority("Role_USER");
         http.authorizeRequests().antMatchers(HttpMethod.POST,"/api/coll/addcoll/**").hasAnyAuthority("Role_ADMIN");
-        http.authorizeRequests().anyRequest().authenticated();
+        http.authorizeRequests().anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .and()
+                .oauth2Login();
+
                /* //newwwwwww
                 .and().formLogin().loginPage("/login").defaultSuccessUrl("/welcom").failureUrl("/login?error=true").permitAll()
                         .and().logout().deleteCookies("JSESSIONID").logoutUrl("/logout").logoutSuccessUrl("/login");
@@ -67,8 +72,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(new customAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
+
     @Override
     @Bean
+    //authmanager pour traiter les jetons de demande d'authentification créés par l'implémentation des classes.
     public AuthenticationManager authenticationManagerBean() throws  Exception{
         return super.authenticationManagerBean();
     }

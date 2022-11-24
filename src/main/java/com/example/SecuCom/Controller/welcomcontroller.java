@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 
 @CrossOrigin()
 @Controller
-@RequestMapping()
+@RequestMapping("/api")
 public class welcomcontroller {
 
     @Autowired
@@ -70,6 +71,25 @@ public class welcomcontroller {
 
         Collaborateurs collaborateurs = (Collaborateurs) collService.findByUsernameOrEmail(usernameoremail).getRoles();
          return "Bienvenue ADMIN";
+    }
+    @RolesAllowed("Role_USER")
+    @RequestMapping("/**")
+    public String getUser()
+    {
+        return "Welcome User";
+    }
+
+    @RolesAllowed({"Role_ADMIN"})
+    @RequestMapping("/admin")
+    public String getAdmin()
+    {
+        return "Welcome Admin";
+    }
+
+    @RequestMapping("/*")
+    public String getGithub()
+    {
+        return "Welcome Github user!";
     }
 
 }
