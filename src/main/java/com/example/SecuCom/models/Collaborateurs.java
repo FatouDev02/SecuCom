@@ -16,6 +16,7 @@ import static javax.persistence.FetchType.EAGER;
 @AllArgsConstructor
 public class Collaborateurs {
     @Id
+
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String nom;
@@ -23,7 +24,6 @@ public class Collaborateurs {
     private String username;
     private String mail;
     private String password;
-
     @ManyToMany(fetch = EAGER)
     private Collection<Role> roles= new ArrayList<>();
 

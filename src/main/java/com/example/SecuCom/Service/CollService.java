@@ -4,7 +4,7 @@ import com.example.SecuCom.models.Collaborateurs;
 import com.example.SecuCom.models.Role;
 
 import java.util.List;
-
+//@ Buider pour un dto sert a mapper un userclass a un userdto "recuperer les inf de userclzasss"
 public interface CollService {
     Collaborateurs ajoutercoll(Collaborateurs collaborateurs );
     String suppcoll(Long id);

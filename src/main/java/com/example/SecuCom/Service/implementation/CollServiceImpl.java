@@ -22,8 +22,6 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
-//
-// @AllArgsConstructor
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
@@ -38,7 +36,7 @@ public class CollServiceImpl implements CollService, UserDetailsService {
     @Override
     public Collaborateurs ajoutercoll(Collaborateurs collaborateurs) {
         //comment
-        log.info("saving new user {} to database",collaborateurs.getUsername());
+        log.info("Ajout d'un collaborateur {} ",collaborateurs.getUsername());
         //a l'enregistrement on recupère le passwor et le l'encode
         collaborateurs.setPassword(passwordEncoder.encode(collaborateurs.getPassword()));
         return collRepo.save(collaborateurs);
@@ -46,14 +44,16 @@ public class CollServiceImpl implements CollService, UserDetailsService {
 
     @Override
     public Role ajoutrole(Role role) {
-        log.info("saving role user {} to database",role.getName());
+        log.info("Ajout d'un role  {} dans la Bdd",role.getName());
         return roleRepo.save(role);
     }
 
     @Override
     public String suppcoll(Long id) {
+        log.info("Suppression d'un collaborateur par id {}",id);
+
         this.collRepo.deleteById(id);
-        return "utilisateur supprimé";
+        return "Collaborateur supprimé";
     }
 
     @Override
@@ -77,7 +77,7 @@ public class CollServiceImpl implements CollService, UserDetailsService {
 
     @Override
     public Collaborateurs getuser(String username) {
-        log.info("fecthing user {} ",username);
+        log.info("Recupération d'un collaborateur {} ",username);
 
         return collRepo.findByUsername(username);
 
@@ -85,7 +85,7 @@ public class CollServiceImpl implements CollService, UserDetailsService {
 
     @Override
     public List<Collaborateurs> lister() {
-        log.info("fecthing all users {} ");
+        log.info("Récuperation de tout les collaborateurs {} ");
 
         return collRepo.findAll();
     }
@@ -103,7 +103,7 @@ public class CollServiceImpl implements CollService, UserDetailsService {
 
     @Override
     public void addroletoColl(String username, String roleName) {
-        log.info("ADDing role {} to user {}",roleName,username);
+        log.info("Attribution d'un role {} à un collaborateur {}",roleName,username);
         Collaborateurs coll=collRepo.findByUsername(username);
         Role role=roleRepo.findByName(roleName);
         //will executing because we have transactionnal
@@ -121,15 +121,14 @@ public class CollServiceImpl implements CollService, UserDetailsService {
         Collaborateurs collaborateurs=collRepo.findByUsername(username);
         if(collaborateurs == null){
             //si le coll n'existe pas retouner cette erreur
-            log.error("Utilisateur non trouvé");
+            log.error("Collaborateur non trouvé");
 
-            throw new UsernameNotFoundException("Utilisateur non trouvé");
+            throw new UsernameNotFoundException("Collaborateur non trouvé");
         } else{
             //sinon sil existe retouner ce messsage
-            log.info("Utilisateur  trouvé",username);
+            log.info("Collaborateur  trouvé",username);
 
         }
-
 
         //noonnnnnnnnnnnn compris
         Collection<SimpleGrantedAuthority> authorities= new ArrayList<>();

@@ -1,0 +1,8 @@
+Presentation de l'app
+En ajouter la dependance de Oauth, il sécurisera votre application avec OAuth 2.0 par défaut.
+Ajouter une nouvelle application GitHub:(Configurer application.properties"client id et client secret")
+Lorsque nous fournissons les informations d'identification,
+Spring a plusieurs façons de lire les détails de l'authentification, ce qui inclut.
+
+Service de détails utilisateur personnalisés" Custom User Details Service ""
+

@@ -31,9 +31,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class customAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         if(request.getServletPath().equals("/api/login") || request.getServletPath().equals("/refreshtoken/**") ){
             filterChain.doFilter(request,response);
-        }else{
+        }
+        else{
             String authorizationHeader = request.getHeader(AUTHORIZATION);
             if(authorizationHeader != null && authorizationHeader.startsWith("b ")){
 
@@ -50,13 +52,15 @@ public class customAuthorizationFilter extends OncePerRequestFilter {
                     stream(roles).forEach(role->{
                         authorities.add(new SimpleGrantedAuthority(role));
                     });
+                  // UsernamePasswordAuthenticationToken se chargera de récupérer le nom de l’utilisateur, après avoir authentifié le token en utilisant la méthode getPrincipal()
                     UsernamePasswordAuthenticationToken authenticationToken=
                             new UsernamePasswordAuthenticationToken(username,null,authorities);
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
                     filterChain.doFilter(request,response);
 
                 } catch (Exception e){
-                    log.error("error loggingg",e.getMessage());
+                    log.error("Erreur de  loggingg",e.getMessage());
                     response.setHeader("error",e.getMessage());
                     response.setStatus(FORBIDDEN.value());
 

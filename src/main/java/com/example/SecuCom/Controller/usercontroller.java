@@ -10,17 +10,11 @@ import com.example.SecuCom.models.Role;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -30,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -47,22 +40,25 @@ public class usercontroller {
     @PostMapping("/coll/addcoll")
     public ResponseEntity<Collaborateurs> adduser(@RequestBody Collaborateurs collaborateurs){
         URI uri=URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/adduser").toUriString());
-        //return ResponseEntity.ok().body( userservice.ajouter(us));
         return ResponseEntity.created(uri).body( collService.ajoutercoll(collaborateurs));
     }
+
+
     @PreAuthorize("hasRole('Role_ADMIN')")
     @PostMapping("/addrole")
     public ResponseEntity<Role> addRole(@RequestBody Role role ){
         return ResponseEntity.ok().body( collService.ajoutrole(role));
     }
+
+
     @PreAuthorize("hasRole('Role_ADMIN')")
     @PostMapping("/addroletoColl")
     public ResponseEntity<?> addroletouser(@RequestBody RoletoColl roletoColl ){
         URI uri=URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/addroletocoll").toUriString());
-        //return ResponseEntity.ok().body( userservice.ajouter(us));
         collService.addroletoColl(roletoColl.getUsername(),roletoColl.getRolename());
         return ResponseEntity.ok().build();
     }
+
     @PreAuthorize("hasRole('Role_ADMIN')")
     @GetMapping("/refreshtoken")
     public void refreshtoken(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -115,6 +111,7 @@ public class usercontroller {
 
         return  ResponseEntity.ok().body(collService.lister());
     }
+
     @PreAuthorize("hasRole('Role_ADMIN')")
     @GetMapping("/coll/afficher/{id}")
     public Collaborateurs read(@PathVariable Long id){
@@ -133,6 +130,15 @@ public class usercontroller {
     @PostMapping("/coll/update/{id}")
     public  Collaborateurs update(@RequestBody  Collaborateurs coll,@PathVariable Long id){
         return  collService.modifiercoll(coll,id);
+    }
+    @PreAuthorize("hasRole('Role_USER')  or hasRole('Role_ADMIN')")
+    @DeleteMapping("/coll/delete/{id}")
+//    public  String del(@PathVariable Long id){
+//       this.collService.suppcoll(id);
+//        return "Collaborateur supprimé";
+//    }
+    public ResponseEntity<?>getcolls(@PathVariable Long id){
+        return  ResponseEntity.ok().body(collService.suppcoll(id));
     }
 }
 

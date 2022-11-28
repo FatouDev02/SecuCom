@@ -1,35 +1,23 @@
 package com.example.SecuCom.Controller;
 
-
-import aj.org.objectweb.asm.ConstantDynamic;
 import com.example.SecuCom.Repository.CollRepo;
 import com.example.SecuCom.Service.CollService;
-import com.example.SecuCom.models.Collaborateurs;
-import com.example.SecuCom.models.Role;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
-
-@CrossOrigin()
-@Controller
-@RequestMapping("/api")
+@RestController
 public class welcomcontroller {
 
     @Autowired
@@ -39,57 +27,66 @@ public class welcomcontroller {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-
-    @PreAuthorize("hasRole('Role_USER')  or hasRole('Role_ADMIN')")
-    @GetMapping("/login")
-    public ResponseEntity<?> authenticateUser(Principal c){
-
-
-       // return new ResponseEntity<>("bienvenue"+ collService.getuser((c.getName())).getRoles(), HttpStatus.OK);
-
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(collService.getuser((c.getName())).getUsername(),collService.getuser((c.getName())).getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        User user= (User)authentication.getPrincipal();
-        List<String> roles = user.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
-        List<String> entite= new ArrayList<>(); entite.add("Role_USER");
-        if(roles.equals(entite)){
-            return ResponseEntity.ok().body("Bienvenu User");
-        }else{
-            return ResponseEntity.ok().body("Bienvenu admin");
-
-        }
-
+    private final OAuth2AuthorizedClientService authorizedClientService;
+    public welcomcontroller(OAuth2AuthorizedClientService authorizedClientService) {
+        this.authorizedClientService = authorizedClientService;
     }
 
-    @PreAuthorize("hasRole('Role_ADMIN')")
-     @GetMapping("welcomadmin")
-    public String welcomAdmin(String usernameoremail) {
-
-        Collaborateurs collaborateurs = (Collaborateurs) collService.findByUsernameOrEmail(usernameoremail).getRoles();
-         return "Bienvenue ADMIN";
-    }
-    @RolesAllowed("Role_USER")
-    @RequestMapping("/**")
-    public String getUser()
-    {
-        return "Welcome User";
-    }
-
-    @RolesAllowed({"Role_ADMIN"})
-    @RequestMapping("/admin")
-    public String getAdmin()
-    {
-        return "Welcome Admin";
-    }
 
     @RequestMapping("/*")
-    public String getGithub()
-    {
-        return "Welcome Github user!";
+    public String getUserInfo(Principal user) {
+        StringBuffer userInfo= new StringBuffer();
+        if(user instanceof UsernamePasswordAuthenticationToken){
+            userInfo.append(getUsernamePasswordLoginInfo(user));
+        }
+        else if(user instanceof OAuth2AuthenticationToken){
+            userInfo.append(getOauth2LoginInfo(user));
+        }
+        return userInfo.toString();
+    }
+
+    /*La classe UsernamePasswordAuthenticationToken se chargera de récupérer le nom de l’utilisateur,
+     après avoir authentifié le token en utilisant la méthode getPrincipal() .
+     Ensuite, cette information sera ajoutée à l’instance du StringBuffer nommée usernameInfo*/
+    private StringBuffer getUsernamePasswordLoginInfo(Principal user) {
+        StringBuffer usernameInfo = new StringBuffer();
+
+        UsernamePasswordAuthenticationToken token = ((UsernamePasswordAuthenticationToken) user);
+        if(token.isAuthenticated()){
+            User u = (User) token.getPrincipal();
+            usernameInfo.append("Welcome, " + u.getUsername());
+        }
+        else{
+            usernameInfo.append("NA");
+        }
+        return usernameInfo;
+    }
+
+
+    private StringBuffer getOauth2LoginInfo(Principal user){
+        StringBuffer protectedInfo = new StringBuffer();
+
+
+
+        OAuth2AuthenticationToken authToken = ((OAuth2AuthenticationToken) user);
+        OAuth2AuthorizedClient authClient = this.authorizedClientService.loadAuthorizedClient(authToken.getAuthorizedClientRegistrationId(), authToken.getName());
+
+        if(authToken.isAuthenticated()){
+
+            Map<String,Object> userAttributes = ((DefaultOAuth2User) authToken.getPrincipal()).getAttributes();
+            Collection<? extends GrantedAuthority> userAttributess = ((DefaultOAuth2User) authToken.getPrincipal()).getAuthorities();
+
+
+            String userToken = authClient.getAccessToken().getTokenValue();
+            protectedInfo.append("Bienvenue, " + userAttributes.get("name")+"<br><br>");
+            protectedInfo.append("e-mail: " + userAttributes.get("email")+"<br><br>");
+            protectedInfo.append("Role: " + userAttributess+"<br><br>");
+            protectedInfo.append("Access Token: " + userToken+"<br><br>");
+        }
+        else{
+            protectedInfo.append("NA");
+        }
+        return protectedInfo;
     }
 
 }

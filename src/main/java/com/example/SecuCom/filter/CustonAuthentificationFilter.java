@@ -25,6 +25,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 public class CustonAuthentificationFilter extends UsernamePasswordAuthenticationFilter {
+
+    //Gère les modules d’authentification appelés pendant le processus d’authentification du client.
     private final AuthenticationManager authenticationManager;
 
     public CustonAuthentificationFilter(AuthenticationManager authenticationManager) {
@@ -34,7 +36,9 @@ public class CustonAuthentificationFilter extends UsernamePasswordAuthentication
 
     //CustonAuthentificationFilter est appelé dans SecurityConfig dans la requete du filter
 
-//gestion de l'authentification           Effectue l'authentification réelle.
+            //gestion de l'authentification attemptAuthenticationattemptAuthentication
+            // Effectue l'authentification réelle.
+
             @Override
             public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
                 // return super.attemptAuthentication(request, response);
@@ -45,17 +49,19 @@ public class CustonAuthentificationFilter extends UsernamePasswordAuthentication
 
                 UsernamePasswordAuthenticationToken authenticationToken= new UsernamePasswordAuthenticationToken(username,password);
                 return authenticationManager.authenticate(authenticationToken);
-            //authenticationManager est appelé dans SecurityConfig comme bean est reutilise dans la requete du filtre(custonnnn)
+            //authenticationManager est appelé dans SecurityConfig comme bean et est reutilise dans la requete du filtre(custonnnn)
 
             }
     //gestion  jwt Oautth
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
-        // super.successfulAuthentication(request, response, chain, authResult);
+       // provient de security.core.userdetails elle implemente l'interface UserDetails et assure la gestion d'autentification
+       // avec le username le passwd et les authorithies
         User user= (User)authentication.getPrincipal();
-
+        // Algo est une classe abstraite qui definis plsrs algo de......
         Algorithm algorithm=Algorithm.HMAC256("secret".getBytes());
 
+        // notre token
         String access_token = JWT.create()
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 10*60*1000))
@@ -76,9 +82,11 @@ public class CustonAuthentificationFilter extends UsernamePasswordAuthentication
         Map<String,String> tokens=new HashMap<>();
         tokens.put("access_token",access_token);
         tokens.put("refresh_token",refresh_token);
-        tokens.put("message", "Bienvenue "+ user.getUsername());
+        //tokens.put("message", "Bienvenue "+ user.getUsername());
         tokens.put("message", "Bienvenue "+ user.getAuthorities());
 
+
+        //defintion du format sous laquelle la reponse doit s'afficher
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(),tokens);
     }
