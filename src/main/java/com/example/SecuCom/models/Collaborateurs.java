@@ -25,6 +25,7 @@ public class Collaborateurs {
     private String mail;
     private String password;
     @ManyToMany(fetch = EAGER)
+    //Les collections sont des conteneurs qui permettent de regrouper des objets en une seule entité
     private Collection<Role> roles= new ArrayList<>();
 
 }

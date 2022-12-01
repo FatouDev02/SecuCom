@@ -12,8 +12,6 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.security.RolesAllowed;
 import java.security.Principal;
 import java.util.*;
 

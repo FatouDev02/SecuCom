@@ -33,8 +33,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 //AuthenticationManagerBuilder utilisé pour créer un AuthenticationManager.
+//AuthenticationManager permet de garder en mémoire les details de lutilisateur qui s'est connecte et gere comment l'authentification doit se passer en ldap jdbc ou
 // Permet d'intégrer facilement l'authentification en mémoire,
-@Override
+    @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         // super.configure(auth);
        //  userdetailserv logique pour charger les détails de l'utilisateur par nom ou par e-mail à partir de la base de données

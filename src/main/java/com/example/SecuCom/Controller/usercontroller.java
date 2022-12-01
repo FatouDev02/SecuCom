@@ -122,7 +122,6 @@ public class usercontroller {
     @PreAuthorize("hasRole('Role_ADMIN')")
     @GetMapping("/coll/read/{username}")
     public Collaborateurs readbyusername(@PathVariable String username){
-
         return collService.getuser(username);
 
     }

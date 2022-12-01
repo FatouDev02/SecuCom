@@ -44,8 +44,8 @@ public class CustonAuthentificationFilter extends UsernamePasswordAuthentication
                 // return super.attemptAuthentication(request, response);
                 String username = request.getParameter("username");
                 String password = request.getParameter("password");
-                log.info("username is {}",username);
-                log.info("password is {}",password);
+                log.info("username : {}",username);
+                log.info("password : {}",password);
 
                 UsernamePasswordAuthenticationToken authenticationToken= new UsernamePasswordAuthenticationToken(username,password);
                 return authenticationManager.authenticate(authenticationToken);
@@ -75,10 +75,17 @@ public class CustonAuthentificationFilter extends UsernamePasswordAuthentication
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 30*60*1000))
                 .withIssuer(request.getRequestURL().toString())
+                //Stream  est utilisée pour traiter des collections d’objets. Un flux(stream) est une séquence
+                //d’objets qui prend en charge diverses méthodes qui peuvent être enchaînées pour produire le résultat souhaité.
+                //map permet de faire la liaison clé valeur (granted::getAuthority)
+                //GrantedAuthority Représente une autorité accordée à un Authentication objet(notre user ici).
                 .withClaim("roles",user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
 //        response.setHeader("access_token",access_token);
 //        response.setHeader("refresh_token",refresh_token);
+        //A HashMap stocke les éléments dans des paires " clé / valeur ",
+        // et vous pourrez y accéder par un index d'un autre type (par exemple a String
+        // pour y ajouter des éléments, on utilise méthode la put()
         Map<String,String> tokens=new HashMap<>();
         tokens.put("access_token",access_token);
         tokens.put("refresh_token",refresh_token);
